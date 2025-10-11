@@ -3,7 +3,7 @@ A lightweight framework for experimenting with the ESP8266 architecture without 
 This project is designed for learning purposes — to understand the ESP8266 memory map, UART, interrupts, and peripheral handling at the bare-metal level.
 
 ## Requirements
-- Xtensa lx106 toolchain. (Link)[https://dl.espressif.com/dl/xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz]
+- Xtensa lx106 toolchain. [Link](https://dl.espressif.com/dl/xtensa-lx106-elf-gcc8_4_0-esp-2020r3-linux-amd64.tar.gz)
 - Esptool.
 
 ## Build
