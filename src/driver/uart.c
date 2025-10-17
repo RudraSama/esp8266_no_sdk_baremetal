@@ -5,7 +5,6 @@
 
 #include <driver/uart.h>
 
-
 response_t uart_init(uint32_t uart, uint32_t baud_rate, uint32_t word_len,
                      uint32_t stop_bit) {
 	if (uart == 0) {
@@ -59,13 +58,13 @@ uint32_t is_rx_fifo_empty(uint32_t uart) {
 }
 
 void write_char(uint32_t uart, char c) {
+	while (is_tx_fifo_full(uart));
 	WRITE_TO_REG(UART_BASE(uart), c);
 }
 
 void write_line(uint32_t uart, const char *line) {
 	uint32_t i = 0;
 	while (line[i]) {
-		while (is_tx_fifo_full(uart));
 		write_char(uart, line[i]);
 		i++;
 	}

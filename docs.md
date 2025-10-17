@@ -13,6 +13,21 @@ esptool.py --port /dev/ttyUSB0 write_flash 0x00000 firmware.bin
 
 ---
 
+# Important Instructions in Xtensa Arch.
+| Instruction | Detail |
+|-------------|--------|
+|   s32i r1, r2, 0     | Store value of r1 at address [r2 + 0] |
+|   l32i r1, r2, 0     | Load value from [r2 + 0] address into r1 |
+|   movi r1, const     | Store any 12bit value (-2048..2047) into r1. It has narrow version movi.n for 6 bit. |
+|   rsr * r1 / rsr r1, * | Read from special register (\*). Both syntax are correct. |
+|   wsr r1, * | Store value of r1 into special register (\*). |
+|   rsync | Waits for wsr to complete its operation, so next instruction can read value of special register correctly. |
+|   rsil r1, 0..15 | saves old PS INTLEVEL into r1 and mask all PS INTLEVEL <= level (0..15). |
+|   xsr  | Exchange Special register |
+
+
+---
+
 # Registers
 ## a0
 Hold return address. When your function calls another function. This register holds the address of caller function.
@@ -41,12 +56,65 @@ The function you call (the callee) must ensure that this register has the same v
 ## a15
 Points to fixed position at current function's stack frame.
 
+## INTENABLE
+Interrupt enable mask.
+There is one bit for each level-1 and high-priority interrupt, except non-maskable interrupt (NMI) and Debug interrupt.
+
+## INTERRUPT
+This register shows which interrupts are currently pending or active.
+
+## INTCLEAR
+Manually clearing pending interrupt.
+
+## INTSET
+Manually set pending interrupt.
+
+## CCOUNT
+It is a special register inside the Xtensa CPU core that counts every CPU clock cycle since reset.
+
+## CCOMPARE0-CCOMPARE2
+Compare value of CCOUNT with value stored inside CCOMPARE register. When CCOUNT == CCOMPARE0, it fires level 1 interrupt to CPU.
+
+## PS
+It’s a 32-bit special register that stores the current processor state.
+Layout - 
+```
+PS.INTLEVEL → INTLEVEL (Current interrupt level (0–15). Higher = more privileged)
+PS.EXCM     → Exception mode flag. (1 = CPU is inside an exception or interrupt).
+PS.UM         User vector mode. (0 - Kernel Mode, 1 - User mode)
+PS.RING       Defines what kind of code is executing, kernel or user code. 
+PS.OWB        ESP8266 (Xtensa LX106) has 64 registers but only 16 registers are visible.
+              After each function call (nested), it shifts window by 8 registers.
+              On interrupt or function call, Current Window context (index) is saved into OWB.
+PS.CALLINC    When new function is called, CPU looks at PS.CALLINC to know how far to move the window base.
+              If CALLINC value is 2 and current windows shows a0-a15 registers, then new will be (2 * 4 = 8) a8a-23 registers.
+PS.WOE        Window Overflow Enable.
+```
+
+
 # CPU Clock Frequency
 
 When ESP8266 comes out of Boot rom, its CPU frequency is 52MHz.
 Frameworks like ESP8266_FREERTOS and Platformio `ets_update_cpu_frequency(uint32_t freq)` function which is defined at `0x40002f04`.
 We can use this function by flashing bin file provided by Esp8266 SDK at location `0x40000000`.
 But right now we are not using external bin file, so our CPU frequency is just 52MHz.
+
+
+# DPORT 
+Dport provideds bridge between CPU and Peripherals.
+DPORT_BASE → 0x3FF000000
+EDGE_INT_ENABLE_REG → (DPORT_BASE + 0x04)
+```
+BIT(0) → WDT Interrupt Enable/Disable.
+BIT(1) → FRC1 Timer Interrupt Enable/Disable.
+// more bits are unknown.
+```
+
+DPORT_CTRL_REG → (DPORT_BASE + 0x14)
+```
+BIT(0) → If set, double CPU clock.
+```
+
 
 
 # I/O
@@ -334,25 +402,74 @@ PAD_XPD_DCDC_CONF (BASE + 0x0A0)
 Do you also want me to **convert the long IOMUX mapping list** (GPIO0 → GPIO15 functions) into a compact table like I did for the GPIO pins?
 ```
 
-## ESP8266 Startup (Got from Platformio ELF for Esp8266)
-_start  -    and a0, a0, a0 (basicall NOP)
-        -    execw          (Waits for any exceptions of previously executed instructions to occur)
+## Timer Registers
 
-_user_call_section
-        -    l32r a2, 0x40100000      (loading address of _start in a0)
-        -    wsr.vecbase a2           (vecbase is Vector Base Register) 
-                                      (Telling CPU that all vectors will start from _start)
-        -    call0 call_user_start    (call to next stage of boot)
+TIME_BASE: `0x60000600`
 
-call_user_start
-        -  
-        -    addi	a1, a1, -16
-        -    s32i	a0, a1, 0
-        -    call0	4010548c <wdt_feed+0x154>           (starts watchdog)
-        -    l32r	a0, 401051b0 <NMI_Handler+0x54>     (No Mask Interrupt Handler)
-        -    callx0	a0
-        -    l32i	a0, a1, 0
-        -    addi	a1, a1, 16
-        -    ret
+FRC1 →  (TIME_BASE + 0x0)
+        (Intitial Counter value)
+```
+BIT(0)-BIT(22) → Initial value of counter
+                 Mask - 0x007FFFFF
+```
+
+FRC1_COUNT → (TIME_BAE + 0x04)
+```
+BIT(0)-BIT(22) → Current value of counter
+                 Mask - 0x007FFFFF
+```
+
+FRC1_CTRL → (TIME_BASE + 0x08)
+```
+BIT(0)          → Interrupt type, 0:edge, 1:level
+BIT(1)          →   
+BIT(2)-BIT(3)   → Prescale-divider. 0: divided by 1, 1: divided
+                  by 16, 2 or 3: divided by 256
+BIT(4)          →
+BIT(5)          →
+BIT(6)          → Automatically reload, when the counter is
+                  equal to zero.
+BIT(7)          → Timer enable.
+BIT(8)          → Timer interrupt flag. (Not exactly know what it does)
+```
+
+FRC1_INT → (TIME_BASE + 0x0c)
+```
+BIT(0) → Set when timer expires.
+```
+
+FRC2 →  (TIME_BASE + 0x20)
+        (Intitial Counter value)
+```
+BIT(0)-BIT(22) → Initial value of counter
+                 Mask - 0x007FFFFF
+```
+
+FRC2_COUNT → (TIME_BAE + 0x24)
+```
+BIT(0)-BIT(22) → Current value of counter
+                 Mask - 0x007FFFFF
+```
+
+FRC2_CTRL → (TIME_BASE + 0x28)
+```
+BIT(0)-BIT(7) → Control bits 
+                 Mask - 0x000000FF
+BIT(8)        → Timer interrupt flag
+```
+
+FRC2_INT → (TIME_BASE + 0x2c)
+```
+BIT(0) → Set when timer expires. 
+```
+FRC2_ALARM → (TIME_BASE + 0x30)
+```
+BIT(0) - BIT(31) → Alarm value.
+                   Mask - 0xFFFFFFFF
+                   When FRC2 counter starts from LOAD value, it get increment 
+                   and when it reaches value stored in FRC2_ALARM, interrupt is triggered.
+```
 
 
+# References
+https://dl.espressif.com/github_assets/espressif/xtensa-isa-doc/releases/download/latest/Xtensa.pdf
