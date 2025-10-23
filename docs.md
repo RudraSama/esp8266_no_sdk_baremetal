@@ -473,3 +473,6 @@ BIT(0) - BIT(31) → Alarm value.
 
 # References
 https://dl.espressif.com/github_assets/espressif/xtensa-isa-doc/releases/download/latest/Xtensa.pdf
+https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf?utm_source=chatgpt.com
+https://github.com/esp8266/esp8266-wiki/wiki/Memory-Map
+https://github.com/espressif/ESP8266_RTOS_SDK/tree/d412ac601befc4dd024d2d2adcfaa319c7463e36
