@@ -5,13 +5,9 @@
 int main() {
 	reset_pins();
 
-	timer_init_t t_init;
-	t_init.clkdiv = TIMER_CLKDIV_256;
-	t_init.int_type = TIMER_LEVEL;
-	t_init.autoload = 0;
+	uart_init(0, 9600, WORD_8_BITS, STOP_1_BIT);
 
-	timer_enable(1);
-
+	printf("\nhelo%x", 1);
 	while (1) {
 	}
 }

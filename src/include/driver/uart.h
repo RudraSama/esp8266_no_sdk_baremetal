@@ -71,12 +71,12 @@ uint32_t is_tx_fifo_full(uint32_t uart);
  */
 void write_char(uint32_t uart, char c);
 
-/* @breif Writing line of Char
- * @param const char *line
+/* @breif Writing each char of string to Buffer
+ * @param const char *c
  * @return
  *      - void
  */
-void write_line(uint32_t uart, const char *line);
+void write_line(uint32_t uart, const char *str);
 
 /* @breif Reading char from buffer
  * @param uint32_t uart

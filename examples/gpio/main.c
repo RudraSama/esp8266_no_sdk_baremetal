@@ -4,10 +4,12 @@
 void main(void) {
 	reset_pins();
 
+	uart_init(0, 9600, WORD_8_BITS, STOP_1_BIT);
 	unsigned int rx;
 	gpio_output_enable(2);
 
 	gpio_set_level(2, 0);
+	printf("\nON");
 	for (rx = 0; rx < 800000; rx++);
 	for (rx = 0; rx < 800000; rx++);
 	for (rx = 0; rx < 800000; rx++);
@@ -16,6 +18,7 @@ void main(void) {
 	for (rx = 0; rx < 800000; rx++);
 
 	gpio_set_level(2, 1);
+	printf("\nOFF");
 
 	while (1);
 }

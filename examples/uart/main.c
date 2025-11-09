@@ -5,7 +5,7 @@ int main() {
 
 	uart_init(0, 9600, WORD_8_BITS, STOP_1_BIT);
 	while (1) {
-		write_line(0, "HELLO");
+		write_line(0, "HELLo");
 		for (uint32_t i = 0; i < 80000; i++);
 		for (uint32_t i = 0; i < 80000; i++);
 		for (uint32_t i = 0; i < 80000; i++);

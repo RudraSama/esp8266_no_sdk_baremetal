@@ -9,8 +9,8 @@
 extern void main(void);
 
 void app_entry(void) {
-	uint32_t a = 0x40100000;
-	asm volatile("wsr %0, vecbase" : "=r"(a));
+	uint32_t vecaddr = 0x40100000;
+	asm volatile("wsr %0, vecbase" : "=r"(vecaddr));
 	save_context();
 	main();
 	restore_context();

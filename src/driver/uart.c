@@ -27,6 +27,8 @@ response_t uart_init(uint32_t uart, uint32_t baud_rate, uint32_t word_len,
 		WRITE_TO_REG(UART_CONFIG0(uart), uart_config0.val);
 
 		uart_set_baud(uart, baud_rate);
+		// Small delay before actually using UART
+		for (uint32_t i = 0; i < 80000; i++);
 	}
 
 	return OK;
@@ -62,13 +64,11 @@ void write_char(uint32_t uart, char c) {
 	WRITE_TO_REG(UART_BASE(uart), c);
 }
 
-void write_line(uint32_t uart, const char *line) {
-	uint32_t i = 0;
-	while (line[i]) {
-		write_char(uart, line[i]);
-		i++;
+void write_line(uint32_t uart, const char *str) {
+	while (*str) {
+		write_char(uart, *str);
+		str++;
 	}
-	write_char(uart, '\n');
 }
 
 char read_char(uint32_t uart) {
