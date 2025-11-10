@@ -3,7 +3,6 @@
  * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
-
 #include <driver/uart.h>
 #include <stdarg.h>
 

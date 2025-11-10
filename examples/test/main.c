@@ -7,7 +7,7 @@ int main() {
 
 	uart_init(0, 9600, WORD_8_BITS, STOP_1_BIT);
 
-	printf("\nhelo%x", 1);
+	printf("\nhelo%x %d", 12, 343);
 	while (1) {
 	}
 }
