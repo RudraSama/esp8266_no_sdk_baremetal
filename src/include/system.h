@@ -9,19 +9,23 @@
 
 #include <reg_rw.h>
 
-#define CPU_CLK_52MHZ (52 * 1000000)
+#define CPU_CLK_52MHZ (80 * 1000000)
 // #define CPU_CLK_80MHZ  (80 * 1000000)
 // #define CPU_CLK_160MHZ (160 * 1000000)
 //
 
 
-#define DPORT_BASE          0x3FF00000
+#define DPORT_BASE              0x3FF00000
 
-#define EDGE_INT_ENABLE_REG (DPORT_BASE + 0x04)
-#define WDT_INT_ENABLE      1
-#define WDT_INT_ENABLE_S    0
-#define TIMER1_INT_ENABLE   1
-#define TIMER1_INT_ENABLE_S 1
+#define EDGE_INT_ENABLE_REG     (DPORT_BASE + 0x04)
+#define WDT_INT_ENABLE          1
+#define WDT_INT_ENABLE_S        0
+#define TIMER1_INT_ENABLE       1
+#define TIMER1_INT_ENABLE_S     1
+
+#define DPORT_CTRL              (DPORT_BASE + 0x14)
+#define DPORT_CTRL_DOUBLE_CLK   1
+#define DPORT_CTRL_DOUBLE_CLK_S 0
 
 #define WDT_INT_EN()                                  \
 	WRITE_TO_REG(EDGE_INT_ENABLE_REG,                 \

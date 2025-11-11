@@ -471,6 +471,36 @@ BIT(0) - BIT(31) → Alarm value.
 ```
 
 
+# Setting CPU Frequency in ESP8266 
+found this code on internet -
+```
+    if(rom_i2c_readReg(103,4,1) != 136) { // 8: 40MHz, 136: 26MHz
+        //if(get_sys_const(sys_const_crystal_26m_en) == 1) { // soc_param0: 0: 40MHz, 1: 26MHz, 2: 24MHz
+            // set 80MHz PLL CPU
+            rom_i2c_writeReg(103,4,1,136);
+            rom_i2c_writeReg(103,4,2,145);
+        //}
+    }
+```
+After finding`rom_i2c_writeReg` and `rom_i2c_readReg` in ESP8266 SDK compiled ELF file and disassmbling it using ghidra, I found that it access `0x60000D10` register. And modify this register like this - 
+```
+#define REG 0x60000D10
+
+volatile uint32_t *reg = (volatile uint32_t *)REG;
+
+int main(){
+	*reg = 0x1880167;
+	do {
+		__asm__ __volatile__("memw");
+	} while ((*reg & 0x2000000) != 0);
+	*reg = 0x1910267;
+	do {
+		__asm__ __volatile__("memw");
+	} while ((*reg & 0x2000000) != 0);
+}
+```
+
+
 # References
 https://dl.espressif.com/github_assets/espressif/xtensa-isa-doc/releases/download/latest/Xtensa.pdf
 https://www.espressif.com/sites/default/files/documentation/esp8266-technical_reference_en.pdf?utm_source
