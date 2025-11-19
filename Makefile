@@ -10,7 +10,7 @@ AS = $(TOOLCHAIN)-as
 ASFLAGS = --warn --fatal-warnings 
 
 CC = $(TOOLCHAIN)-gcc
-CCFLAGS = -Wall -ffreestanding -Isrc/include -c -Wl,-static -Wl,--gc-sections -Wl,-EL
+CCFLAGS = -Wall -ffreestanding -Isrc/include -c -g -Wl,-static -Wl,--gc-sections -Wl,-EL
 
 LD = $(TOOLCHAIN)-ld
 LDFLAGS = -Map $(OUT)/firmware.map  -nostartfiles -T 
@@ -61,7 +61,7 @@ $(EXAMPLE): $(LD_FILES) $(S_OBJS) $(C_OBJS) $(EXAMPLE_OBJS)
 $(S_OBJS): $(OUT)/%.o: $(SRC)/%.S
 	$(Q)mkdir -p $(@D)
 	@echo "Compiling $(@D)/$(@F:.o=.S) ..."
-	$(Q)$(AS) $(ASFLAGS) $< -o $@ 
+	$(Q)$(CC) $(CCFLAGS) $< -o $@ 
 
 $(EXAMPLE_OBJS): $(EXAMPLE_FILES)
 	$(Q) mkdir -p $(@D)

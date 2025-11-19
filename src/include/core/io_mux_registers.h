@@ -1,6 +1,5 @@
 /*
  * file      : io_mux_registers.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  * Reference : ESP8266 RTOS SDK
  */
 

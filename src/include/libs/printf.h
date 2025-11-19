@@ -1,6 +1,5 @@
 /*
  * file      : printf.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 #ifndef PRINTF_H_

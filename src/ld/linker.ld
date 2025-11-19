@@ -20,13 +20,36 @@ SECTIONS
         _inti_end = ABSOLUTE(.);
     } > iram0_0_seg 
 
+
     /* Every IRAM section will go into internal IRAM memory.
      */
+
+    .iram0.vector : ALIGN(4) {
+        KEEP(*(.SystemInfoVector.text));
+        . = 0x10;
+        KEEP(*(.DebugExceptionVector.text));
+        . = 0x20;
+        KEEP(*(.NMIExceptionVector.text));
+        . = 0x30;
+        KEEP(*(.KernelExceptionVector.text));
+        . = 0x50;
+        KEEP(*(.UserExceptionVector.text));
+        . = 0x70;
+        KEEP(*(.DoubleExceptionVector.text));
+    } > iram0_0_seg
+
     .iram0.text : ALIGN(4) {
         _iram0_text_start = ABSOLUTE(.);
+    
         *(.iram0.text* .iram0.literal* .iram0.literal.*)
         *(.literal .text)
         _iram0_text_end = ABSOLUTE(.);
+    } > iram0_0_seg
+
+    .iram0.bss (NOLOAD) : ALIGN(4) {
+        _iram0_bss_start = ABSOLUTE(.);
+        *(.iram0.bss*)
+        _iram0_bss_end = ABSOLUTE(.);
     } > iram0_0_seg
 
     /* Every IROM section will go into SPI Flash Memory.

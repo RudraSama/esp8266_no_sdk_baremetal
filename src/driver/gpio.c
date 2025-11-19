@@ -1,10 +1,14 @@
 /*
  * file      : gpio.c
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 
+#include <core/gpio_registers.h>
+#include <core/io_mux_registers.h>
+#include <core/reg_rw.h>
+#include <core/rtc_registers.h>
 #include <driver/gpio.h>
+#include <response.h>
 
 
 response_t reset_pins() {

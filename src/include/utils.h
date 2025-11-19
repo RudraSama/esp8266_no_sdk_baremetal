@@ -1,6 +1,5 @@
 /*
  * file      : utils.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 #ifndef UTILS_H_

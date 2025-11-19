@@ -1,17 +1,13 @@
 /*
  * file      : timer.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 
 #ifndef TIMER_H_
 #define TIMER_H_
 
-#include <reg_rw.h>
 #include <response.h>
 #include <stdint.h>
-#include <system.h>
-#include <timer_registers.h>
 
 typedef enum {
 	TIMER_CLKDIV_1 = 0,

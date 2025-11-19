@@ -1,9 +1,15 @@
 /*
  * file      : uart.c
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
+#include <core/io_mux_registers.h>
+#include <core/reg_rw.h>
+#include <core/system.h>
+#include <core/uart_registers.h>
 #include <driver/uart.h>
+#include <response.h>
+#include <stdint.h>
+
 
 response_t uart_init(uint32_t uart, uint32_t baud_rate, uint32_t word_len,
                      uint32_t stop_bit) {
@@ -36,7 +42,7 @@ response_t uart_init(uint32_t uart, uint32_t baud_rate, uint32_t word_len,
 
 
 response_t uart_set_baud(uint32_t uart, uint32_t baud_rate) {
-	uint32_t clk_div = (uint32_t)(CPU_CLK_52MHZ / (baud_rate));
+	uint32_t clk_div = (uint32_t)(APB_CLK / (baud_rate));
 	WRITE_TO_REG(UART_CLKDIV(uart), clk_div);
 	return OK;
 }

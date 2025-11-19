@@ -24,6 +24,7 @@ esptool.py --port /dev/ttyUSB0 write_flash 0x00000 firmware.bin
 |   rsync | Waits for wsr to complete its operation, so next instruction can read value of special register correctly. |
 |   rsil r1, 0..15 | saves old PS INTLEVEL into r1 and mask all PS INTLEVEL <= level (0..15). |
 |   xsr  | Exchange Special register |
+|   entry sp size | It will create space in stack frame with size bytes |
 
 
 ---
@@ -86,6 +87,7 @@ PS.RING       Defines what kind of code is executing, kernel or user code.
 PS.OWB        ESP8266 (Xtensa LX106) has 64 registers but only 16 registers are visible.
               After each function call (nested), it shifts window by 8 registers.
               On interrupt or function call, Current Window context (index) is saved into OWB.
+              ESP8266 is based on call0 and not on Window ABI.
 PS.CALLINC    When new function is called, CPU looks at PS.CALLINC to know how far to move the window base.
               If CALLINC value is 2 and current windows shows a0-a15 registers, then new will be (2 * 4 = 8) a8a-23 registers.
 PS.WOE        Window Overflow Enable.
@@ -468,6 +470,20 @@ BIT(0) - BIT(31) → Alarm value.
                    Mask - 0xFFFFFFFF
                    When FRC2 counter starts from LOAD value, it get increment 
                    and when it reaches value stored in FRC2_ALARM, interrupt is triggered.
+```
+
+# Interrupt related info (from ESP8266 RTOS)
+```
+/* interrupt related */
+#define ETS_SLC_INUM        1
+#define ETS_SPI_INUM        2
+#define ETS_GPIO_INUM       4
+#define ETS_UART_INUM       5
+#define ETS_MAX_INUM        6
+#define ETS_SOFT_INUM       7
+#define ETS_WDT_INUM        8
+#define ETS_FRC_TIMER1_INUM 9
+#define ETS_INT_MAX         14
 ```
 
 

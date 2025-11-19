@@ -1,16 +1,12 @@
 /*
  * file      : uart.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 #ifndef UART_H_
 #define UART_H_
 
-#include <io_mux_registers.h>
-#include <reg_rw.h>
 #include <response.h>
-#include <system.h>
-#include <uart_registers.h>
+#include <stdint.h>
 
 /*
  * Common Baud rates

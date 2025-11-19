@@ -1,12 +1,16 @@
 /*
  * file      : printf.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 #include <driver/uart.h>
+#include <libs/printf.h>
 #include <stdarg.h>
 
 static void write_int(int num) {
+	if (num == 0) {
+		write_char(0, '0');
+		return;
+	}
 	uint32_t is_neg = 0;
 	char result[10];
 	if (num < 0) is_neg = 1;

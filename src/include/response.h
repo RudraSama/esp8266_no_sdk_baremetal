@@ -1,6 +1,5 @@
 /*
  * file      : response.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 #ifndef RESPONSE_H_

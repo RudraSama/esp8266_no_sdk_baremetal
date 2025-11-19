@@ -1,6 +1,5 @@
 /*
  * file      : gpio.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  * Reference : ESP8266 RTOS SDK
  */
 
@@ -8,11 +7,8 @@
 #define GPIO_H_
 
 
-#include <gpio_registers.h>
-#include <io_mux_registers.h>
-#include <reg_rw.h>
+
 #include <response.h>
-#include <rtc_registers.h>
 #include <stdint.h>
 
 

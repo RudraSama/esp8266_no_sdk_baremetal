@@ -1,9 +1,13 @@
 /*
  * file      : timer.c
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
+#include <core/isr.h>
+#include <core/reg_rw.h>
+#include <core/system.h>
+#include <core/timer_registers.h>
 #include <driver/timer.h>
+#include <response.h>
 
 
 response_t timer_init(timer_init_t timer_init, uint32_t ms) {
@@ -11,7 +15,7 @@ response_t timer_init(timer_init_t timer_init, uint32_t ms) {
 	timer_autoload(timer_init.autoload);
 	timer_set_int_type(timer_init.int_type);
 
-	uint32_t load_value = (CPU_CLK_52MHZ / timer_get_clkdiv()) * ms / 1000;
+	uint32_t load_value = (APB_CLK / timer_get_clkdiv()) * ms / 1000;
 	timer_load(load_value);
 
 	return OK;
@@ -46,6 +50,11 @@ response_t timer_set_int_type(timer_int_type_t int_type) {
 	frc1_ctrl = frc1_ctrl & ~(1UL);
 	frc1_ctrl = frc1_ctrl | int_type;
 	WRITE_TO_REG(FRC1_CTRL, frc1_ctrl);
+
+	if (int_type == TIMER_EDGE) {
+		TM1_INT_EN();
+		isr_unmask(1 << FRC_TIMER1_INUM);
+	}
 	return OK;
 }
 

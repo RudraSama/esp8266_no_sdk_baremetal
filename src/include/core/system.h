@@ -1,18 +1,24 @@
 /*
- * file      : uart.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
+ * file      : system.h
  * Reference : ESP8266 RTOS SDK
  */
 
 #ifndef SYSTEM_H_
 #define SYSTEM_H_
 
-#include <reg_rw.h>
+#ifndef __ASSEMBLER__
 
-#define CPU_CLK_52MHZ (80 * 1000000)
-// #define CPU_CLK_80MHZ  (80 * 1000000)
-// #define CPU_CLK_160MHZ (160 * 1000000)
-//
+#include <core/reg_rw.h>
+
+#endif
+
+#define CPU_CLK_80MHZ  (80 * 1000000)
+#define CPU_CLK_160MHZ (160 * 1000000)
+#define APB_CLK        CPU_CLK_80MHZ
+
+
+/* The interrupt level used when the CPU enters exception mode */
+#define EXCM_LEVEL              1
 
 
 #define DPORT_BASE              0x3FF00000

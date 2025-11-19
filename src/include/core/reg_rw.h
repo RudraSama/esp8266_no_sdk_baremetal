@@ -1,6 +1,5 @@
 /*
  * file      : reg_rw.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 #ifndef REG_RW_H_

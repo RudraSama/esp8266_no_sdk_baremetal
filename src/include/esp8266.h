@@ -1,6 +1,5 @@
 /*
  * file      : esp8266.h
- * Author    : Lucky Bairagi (luckybairagi96@gmail.com)
  */
 
 
