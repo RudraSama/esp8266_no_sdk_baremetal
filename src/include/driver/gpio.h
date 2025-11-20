@@ -113,6 +113,13 @@ response_t gpio_output_disable(gpio_num_t gpio_num);
  */
 response_t gpio_set_level(gpio_num_t gpio_num, gpio_level_t level);
 
+/* @breif Get GPIO level
+ * @param gpio_num_t gpio_num
+ * @return
+ *      - gpio_level_t HIGH = 1, LOW = 0
+ */
+gpio_level_t gpio_get_level(gpio_num_t gpio_num);
+
 /* @breif Pullup enable. Pullup doesn't exist for RTC GPIO
  * @param gpio_num_t gpio_num
  * @return

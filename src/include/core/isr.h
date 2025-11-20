@@ -7,6 +7,13 @@
 
 #include <stdint.h>
 
+typedef void (*isr_cb)(void *);
+
+typedef struct {
+	isr_cb cb;
+	void *arg;
+} isr_t;
+
 /* Interrupt Number in INTENABLE register */
 #define SLC_INUM        1
 #define SPI_INUM        2
@@ -38,4 +45,18 @@ void isr_mask(uint32_t inum);
  *
  */
 void isr_handler(void);
+
+/* @breif Attaching ISR for Interrupt.
+ * @param uint32_t inum, isr_cb cb, void *arg
+ * @return
+ *
+ */
+void isr_attach(uint32_t inum, isr_cb cb, void *arg);
+
+/* @breif Detaching ISR from Interrupt.
+ * @param uint32_t inum, isr_cb cb, void *arg
+ * @return
+ *
+ */
+void isr_detach(uint32_t inum);
 #endif

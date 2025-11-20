@@ -73,6 +73,11 @@ response_t gpio_set_level(gpio_num_t gpio_num, gpio_level_t level) {
 	return OK;
 }
 
+gpio_level_t gpio_get_level(gpio_num_t gpio_num) {
+	IS_VALID_GPIO(gpio_num);
+	return GPIO_GET_LEVEL(gpio_num) ? HIGH : LOW;
+}
+
 response_t gpio_pullup_en(gpio_num_t gpio_num) {
 	IS_VALID_GPIO(gpio_num);
 

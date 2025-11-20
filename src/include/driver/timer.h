@@ -6,6 +6,7 @@
 #ifndef TIMER_H_
 #define TIMER_H_
 
+#include <core/isr.h>
 #include <response.h>
 #include <stdint.h>
 
@@ -24,15 +25,16 @@ typedef struct {
 	timer_clkdiv_t clkdiv;
 	timer_int_type_t int_type;
 	uint32_t autoload;
+	uint32_t time_ms;
 } timer_init_t;
 
 
 /* @breif Initializing timer.
- * @param uint32_t ms
+ * @param timer_init_t timer_init
  * @return
  *      - response_t OK = 1, FAILED = 0
  */
-response_t timer_init(timer_init_t timer_init, uint32_t ms);
+response_t timer_init(timer_init_t t_init);
 
 /* @breif Set Clock Divisor.
  * @param timer_clkdiv_t clkdiv
@@ -89,5 +91,19 @@ uint32_t timer_is_count_zero(void);
  *      - uint32_t
  */
 uint32_t timer_get_clkdiv(void);
+
+/* @breif Attach ISR for Timer Interrupt.
+ * @param isr_cb cb, void *arg
+ * @return
+ *      - response_t OK = 1, FAILED = 0
+ */
+response_t timer_isr_attach(isr_cb cb, void *arg);
+
+/* @breif Detach ISR for Timer Interrupt.
+ * @param void
+ * @return
+ *      - response_t OK = 1, FAILED = 0
+ */
+response_t timer_isr_detach(void);
 
 #endif

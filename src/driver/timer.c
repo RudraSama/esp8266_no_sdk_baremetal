@@ -10,12 +10,13 @@
 #include <response.h>
 
 
-response_t timer_init(timer_init_t timer_init, uint32_t ms) {
-	timer_set_clkdiv(timer_init.clkdiv);
-	timer_autoload(timer_init.autoload);
-	timer_set_int_type(timer_init.int_type);
+response_t timer_init(timer_init_t t_init) {
+	timer_set_clkdiv(t_init.clkdiv);
+	timer_autoload(t_init.autoload);
+	timer_set_int_type(t_init.int_type);
 
-	uint32_t load_value = (APB_CLK / timer_get_clkdiv()) * ms / 1000;
+	uint32_t load_value =
+	    (APB_CLK / timer_get_clkdiv()) * t_init.time_ms / 1000;
 	timer_load(load_value);
 
 	return OK;
@@ -90,4 +91,14 @@ uint32_t timer_get_clkdiv(void) {
 		return 256;
 	}
 	return 1;
+}
+
+response_t timer_isr_attach(isr_cb cb, void *arg) {
+	isr_attach(1 << FRC_TIMER1_INUM, cb, arg);
+	return OK;
+}
+
+response_t timer_isr_detach(void) {
+	isr_detach(1 << FRC_TIMER1_INUM);
+	return OK;
 }

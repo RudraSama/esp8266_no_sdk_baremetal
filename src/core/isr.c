@@ -5,6 +5,8 @@
 #include <core/isr.h>
 #include <libs/printf.h>
 
+static isr_t isr[INTERRUPT_MAX];
+
 static inline uint32_t get_int_mask(void) {
 	uint32_t interrupt;
 	uint32_t enable;
@@ -29,12 +31,23 @@ void isr_handler(void) {
 		for (uint32_t i = 0; i < INTERRUPT_MAX && intr; i++) {
 			uint32_t bit = (1 << i);
 
-			if (!(bit & intr)) continue;
+			if (!(bit & intr) || !(isr[bit].cb)) continue;
+
+			isr[bit].cb(isr[bit].arg);
 
 			clear_int_mask(bit);
 
 			intr = intr & ~(bit);
-			// will do something here
 		}
 	}
+}
+
+void isr_attach(uint32_t inum, isr_cb cb, void *arg) {
+	isr[inum].cb = cb;
+	isr[inum].arg = arg;
+}
+
+void isr_detach(uint32_t inum) {
+	isr[inum].cb = (void *)0;
+	isr[inum].arg = (void *)0;
 }

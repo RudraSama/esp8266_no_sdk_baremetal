@@ -251,20 +251,23 @@ typedef union {
 // Enabling GPIO OUTPUT
 #define ENABLE_GPIO_OUTPUT(gpio_pin) \
 	WRITE_TO_REG(GPIO_ENABLE_W1TS,   \
-	             READ_FROM_REG(GPIO_ENABLE_W1TS) | (1 << gpio_num))
+	             READ_FROM_REG(GPIO_ENABLE_W1TS) | (1 << gpio_pin))
 
 // Disabling GPIO OUTPUT
 #define DISABLE_GPIO_OUTPUT(gpio_pin) \
 	WRITE_TO_REG(GPIO_ENABLE_W1TC,    \
-	             READ_FROM_REG(GPIO_ENABLE_W1TC) | (1 << gpio_num))
+	             READ_FROM_REG(GPIO_ENABLE_W1TC) | (1 << gpio_pin))
 
 // Set GPIO Level HIGH
 #define GPIO_SET_LEVEL_HIGH(gpio_pin) \
-	WRITE_TO_REG(GPIO_OUT_W1TS, READ_FROM_REG(GPIO_OUT_W1TS) | (1 << gpio_num));
+	WRITE_TO_REG(GPIO_OUT_W1TS, READ_FROM_REG(GPIO_OUT_W1TS) | (1 << gpio_pin))
 
 // Set GPIO Level HIGH
 #define GPIO_SET_LEVEL_LOW(gpio_pin) \
-	WRITE_TO_REG(GPIO_OUT_W1TC, READ_FROM_REG(GPIO_OUT_W1TC) | (1 << gpio_num));
+	WRITE_TO_REG(GPIO_OUT_W1TC, READ_FROM_REG(GPIO_OUT_W1TC) | (1 << gpio_pin))
+
+#define GPIO_GET_LEVEL(gpio_pin) \
+	((READ_FROM_REG(GPIO_IN) & (1 << gpio_pin)) ? 1 : 0)
 
 
 #endif
