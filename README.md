@@ -20,6 +20,5 @@ This project is designed for learning purposes — to understand the ESP8266 mem
 
 ## NOTE
 - This is for experimenting with ESP8266's architecture so most of the functionality will not work.
-- We are not using libraries provided by official SDK so we can't use `os_update_cpu_frequency(uint32_t freq)` to update frequency of ESP8266 from 52MHz to 80MHz or 160MHz.
 - This is basic framework so we can't use SPI flash to execute program in ESP8266. (Or maybe I am too dump to make it work)
 - To learn about memmory mapping and register mapping of ESP8266, read docs.md file.
