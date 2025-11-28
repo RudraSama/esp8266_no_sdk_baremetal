@@ -1,9 +1,6 @@
-
-
 ````markdown
 # Compiling Source
 
-```bash
 xtensa-lx106-elf-as -o crt0.o crt0.S
 xtensa-lx106-elf-gcc -nostdlib -c main.c -o main.o
 xtensa-lx106-elf-ld -T linker.ld crt0.o main.o -o firmware.elf
@@ -131,7 +128,7 @@ BIT(0) → If set, double CPU clock.
 - If we do not set baud rate, then by default baud rate of ESP8266 is 74880.
 
 
-UART_BASE      →  0x60000000
+UART_BASE        →  0x60000000
 UART_FIFO_REG    →  (UART_BASE + 0x0)
                     We can read 8 LSB while masking other bits.
                     Masking other bits remove garbage values.
@@ -275,12 +272,187 @@ UART_ID         → (UART_BASE + 0x7C)
 
 ---
 
-## GPIOs
+## SPI
+* **SPI0** → Starts at `0x60000200`, size `0x100`
+* **SPI1** → Starts at `0x60000100`, size `0x100`
 
-| GPIO   | Pin | Function     |
-| ------ | --- | ------------ |
-| GPIO0  | 15  | GPIO0\_U     |
-| GPIO1  | 26  | U0TXD\_U     |
+SPI0_BASE        →  0x60000200
+
+SPI0_CMD         →  (SPI0_BASE + 0x00)
+`BIT(18)         →  User-Defined SPI transaction`
+```
+BIT(20)          →  Read Electronic Signature
+BIT(22)          →  Chip Erase
+BIT(23)          →  Block Erase
+BIT(24)          →  Sector Erase 
+BIT(25)          →  Page Program 
+BIT(26)          →  Write Status Register 
+BIT(27)          →  Read Status Register 
+BIT(28)          →  Read JEDEC ID
+BIT(29)          →  Write Disable Flash 
+BIT(30)          →  Write Enable Flash 
+BIT(31)          →  Read From Flash 
+```
+
+SPI0_ADDR        →  (SPI0_BASE + 0x04)
+                    Holds a 24-bit flash address for read/write/erase operations.
+
+SPI0_CTRL        →  (SPI0_BASE + 0x08)
+```
+BIT(13)          →  Fast Read Mode
+BIT(14)          →  Dual Output
+BIT(20)          →  Quad Output
+BIT(23)          →  Dual I/O Mode
+BIT(24)          →  Quad I/O Mode
+BIT(25)          →  Read BIT Order (LSB First)
+BIT(26)          →  Write BIT Order (LSB First)
+```
+
+SPI0_CTRL1        →  (SPI0_BASE + 0x0C)
+```
+BIT(28)-BIT(31)  →  CS Hold Delay. It is 4 bits value (0xF).
+                    This sets how long Chip Select (CS) stays asserted (LOW) after finishing a SPI transaction.
+BIT(16)-BIT(27)  →  This is a resolution divider or prescaler for the CS hold timing. It is 12 bits value (0xFFF).
+```
+
+SPI0_RD_STATUS   →  (SPI0_BASE + 0x10)
+                    When in Slave Mode, It acts as a status register that the SPI master can read from the slave. 
+                    When in Master Mode, It contains status received from the external device.
+
+SPI0_CTRL2       →  (SPI0_BASE + 0x14)
+```
+BIT(16)-BIT(17)  →  MISO Signals are delayed relative to SPI Clock. 0 - No Delay, 1 - Half Cycle, 2 - One Cycle.
+BIT(18)-BIT(20)  →  MISO Signals are delayed by 80MHz clock cycle. 
+BIT(21)-BIT(22)  →  MOSI Signals are delayed relative to SPI Clock. 0 - No Delay, 1 - Half Cycle, 2 - One Cycle.
+BIT(23)-BIT(25)  →  MOSI Signals are delayed by 80MHz clock cycle.
+BIT(26)-BIT(27)  →  SPI CS Signal is delayed relative to SPI Clock. 0 - No Delay, 1 - Half Cycle, 2 - One Cycle.
+BIT(28)-BIT(31)  →  SPI CS Signal are delayed by 80MHz clock cycle.
+```
+
+SPI0_CLK         →  (SPI0_BASE + 0x18)
+```
+BIT(0)-BIT(5)    →  (spi_clkcnt_L)In the master mode, it must be eqaul to spi_clkcnt_N. In the slave mode, it must be 0. It defines how long clock stays LOW.
+BIT(6)-BIT(11)   →  (spi_clkcnt_H) In the master mode, it must be floor((spi_clkcnt_N+1)/2-1). In the slave mode, it must be 0. It defines how long clock stays HIGH.
+BIT(12)-BIT(17)  →  In the master mode, it is the divider of spi_clk. So spi_clk frequency is 80MHz/(spi_clkdiv_pre+1)/(spi_clkcnt_N+1).
+BIT(18)-BIT(30)  →  In the master mode, it is pre-divider of spi_clk. 
+BIT(31)          →  In the master mode, 1: spi_clk is eqaul to 80MHz, 0: spi_clk is divided from 80 MHz clock.
+```
+SPI0_USER        → (SPI0_BASE + 0x1C)
+```
+BIT(6)           →  (spi_ck_i_edge) Slave mode: 1 = rising edge, 0 = falling edge.
+BIT(10)          →  (spi_rd_byte_order) MISO byte order: 1 = little-endian, 0 = big-endian.
+BIT(11)          →  (spi_wr_byte_order) MOSI/command/address byte order: 1 = little-endian, 0 = big-endian.
+BIT(12)          →  (spi_fwrite_dual) Read-data phase uses 2 signals.
+                    Here MOSI becomes IO0 and MISO becomes IO1.
+BIT(13)          →  (spi_fwrite_quad) Read-data phase uses 4 signals.
+                    Here two additional data pins are added IO2 and IO3.
+                    In both Dual and Quad mode, SPI works in Half Duplex.
+BIT(14)          →  (spi_fwrite_dio) Write operation uses 2 signals for address + read-data phases.
+BIT(15)          →  (spi_fwrite_qio) Write operation uses 4 signals for address + read-data phases.
+BIT(16)          →  (spi_sio) 1: MOSI and MISO share the same pin (single-wire mode).
+BIT(24)          →  (reg_usr_miso_highpart) Read-data phase uses only high buffer (spi_w8 ~ spi_w15).
+BIT(25)          →  (reg_usr_mosi_highpart) Write-data phase uses only high buffer (spi_w8 ~ spi_w15).
+BIT(27)          →  (spi_usr_mosi) Enables the "write-data" phase (data sent on MOSI).
+BIT(28)          →  (spi_usr_miso) Enables the "read-data" phase (data received on MISO).
+BIT(29)          →  (spi_usr_dummy) Enables the "dummy" phase used for read timing alignment.
+BIT(30)          →  (spi_usr_addr) Enables the "address" phase of the transaction.
+                    For flash reads/writes you normally set this to 1 and write the 24 or 32 bit address into the address register(s) before starting the transaction.
+BIT(31)          →  (spi_usr_command) Enables the "command" phase of an SPI transaction.
+```
+
+SPI0_USER1       → (SPI0_BASE + 0x20)
+```
+BIT(0)–BIT(7)     →  (reg_usr_dummy_cyclelen) Number of dummy cycles during the dummy phase. Value stored = (cycle_count - 1).
+BIT(8)–BIT(16)    →  (reg_usr_miso_bitlen) Length (in bits) of the "read-data" (MISO) phase. Value stored = (number_of_bits - 1).
+BIT(17)–BIT(25)   →  (reg_usr_mosi_bitlen) Length (in bits) of the "write-data" (MOSI) phase. Value stored = (number_of_bits - 1).
+BIT(26)–BIT(31)   →  (reg_usr_addr_bitlen) Length (in bits) of the "address" phase. Value stored = (number_of_bits - 1). 
+```
+
+SPI0_USER2        →  (SPI0_BASE + 0x24)
+```
+BIT(0)-BIT(15)    →  The value of "command" phase.
+BIT(28)-BIT(31)   →  The length in bits of "command" phase. The register value shall be (bit_num-1).
+```
+
+SPI0_WR_STATUS    →  (SPI0_BASE + 0x28)
+```
+BIT(0)-BIT(31)    →  In the slave mode, this register are the status register for the master to write into
+```
+
+SPI0_PIN    →  (SPI0_BASE + 0x2C)
+```
+BIT(0)      →  1: disable CS0; 0: spi_cs signal is from/to CS0 pin
+BIT(1)      →  1: disable CS1; 0: spi_cs signal is from/to CS1 pin
+BIT(2)      →  1: disable CS0; 0: spi_cs signal is from/to CS0 pin
+```
+
+SPI0_SLAVE        →  (SPI0_BASE + 0x30)
+```
+BIT(0)            →  (slv_rd_buf_done) Interrupt raw bit for completion of "read-buffer" operation (slave mode).
+                     Master set this bit to 1 after completing read operation.
+BIT(1)            →  (slv_wr_buf_done) Interrupt raw bit for completion of "write-buffer" operation (slave mode).
+BIT(2)            →  (slv_rd_sta_done) Interrupt raw bit for completion of "read-status" operation (slave mode).
+BIT(3)            →  (slv_wr_sta_done) Interrupt raw bit for completion of "write-status" operation (slave mode).
+BIT(4)            →  (spi_trans_done) Interrupt raw bit for completion of any SPI operation (valid in both master & slave modes).
+                     Transaction starts when CS goes LOW and it ends when CS goes HIGH. 
+BIT(5)–BIT(9)     →  (spi_int_en) Interrupt enable bits for the above 5 source (slv_rd_buf_done, slv_wr_buf_done, slv_rd_sta_done, slv_wr_sta_done, spi_trans_done).
+BIT(23)–BIT(26)   →  (spi_trans_cnt) Read-only operation counter (counts SPI transactions).
+BIT(27)           →  (slv_cmd_define)
+                     1: Slave-mode command codes come from SPI_SLAVE3.
+                     0: Slave-mode commands are fixed:
+                        1 = write-status
+                        4 = read-status
+                        2 = write-buffer
+                        3 = read-buffer
+BIT(30)           →  (spi_slave_mode)
+                     1: SPI runs in slave mode.
+                     0: SPI runs in master mode.
+BIT(31)           →  (spi_sync_reset) Synchronous reset of the SPI module. Write 1 → module resets → bit auto-clears.
+```
+
+SPI0_SLAVE1       → (SPI0_BASE + 0x34) 
+```
+BIT(0)            →  (slv_rdbuf_dummy_en) Enable bit for the "dummy" phase in read-buffer operations (slave mode).
+BIT(1)            →  (slv_wrbuf_dummy_en) Enable bit for the "dummy" phase in write-buffer operations (slave mode).
+BIT(2)            →  (slv_rdsta_dummy_en) Enable bit for the "dummy" phase in read-status operations (slave mode).
+BIT(3)            →  (slv_wrsta_dummy_en) Enable bit for the "dummy" phase in write-status operations (slave mode).
+BIT(4)–BIT(9)     →  (slv_wr_addr_bitlen) Address length (in bits) for **write-buffer** operations (slave mode) Register value = (bit_num - 1).
+BIT(10)–BIT(15)   →  (slv_rd_addr_bitlen) Address length (in bits) for **read-buffer** operations (slave mode) Register value = (bit_num - 1).
+BIT(16)–BIT(24)   →  (slv_buf_bitlen) Data length (in bits) for **write-buffer** and **read-buffer** operations (slave mode) Register value = (bit_num - 1).
+BIT(27)–BIT(31)   →  (slv_status_bitlen) Status length (in bits) for **write-status** and **read-status** operations (slave mode) Register value = (bit_num - 1).
+```
+
+SPI0_SLAVE2       → (SPI0_BASE + 0x38)
+```
+BIT(0)-BIT(7)     → In the slave mode, it is the length in spi_clk cycles of "dummy" phase for "read-status" operations. The register value shall be (cycle_num-1)
+BIT(8)-BIT(15)    → In the slave mode, it is the length in spi_clk cycles of "dummy" phase for "write-status" operations. The register value shall be (cycle_num-1)
+BIT(16)-BIT(23)   → In the slave mode, it is the length in spi_clk cycles of "dummy" phase for "read-buffer" operations. The register value shall be (cycle_num-1
+BIT(24)-BIT(31)   → In the slave mode, it is the length in spi_clk cycles "dummy" phase for "write-buffer" operations. The register value shall be (cycle_num-1)
+```
+
+SPI0_SLAVE3       → (SPI0_BASE + 0x3C)
+```
+BIT(0)-BIT(7)     → In slave mode, it is the value of "read-buffer" command
+BIT(8)-BIT(15)    → In slave mode, it is the value of "write-buffer" command
+BIT(16)-BIT(23)   → In slave mode, it is the value of "read-status" command
+BIT(24)-BIT(31)   → In slave mode, it is the value of "write-status" command
+```
+
+SPI0_W0 - SPI0_W15 → (SPI0_BASE + 0x40) - (SPI0_BASE + 0x7C)
+The data buffer inside SPI module. There are 64byte, i.e., 16 words. Note that only 32bit accessing are supported.
+
+SPI0_EXT3         → (SPI0_BASE + 0xFC)
+```
+BIT(0)-BIT(1)     → This register is for two SPI masters to share the same cs, clock and data signals.
+```
+---               
+                  
+## GPIOs          
+                  
+| GPIO   | Pin |  Function     |
+| ------ | --- |  ------------ |
+| GPIO0  | 15  |  GPIO0\_U     |
+| GPIO1  | 26  |  U0TXD\_U     |
 | GPIO2  | 14  | GPIO2\_U     |
 | GPIO3  | 25  | U0RXD\_U     |
 | GPIO4  | 16  | GPIO4\_U     |
@@ -395,13 +567,6 @@ RTC_GPIO_IN_DATA  (BASE + 0x08C) → Input state
 RTC_GPIO_CONF     (BASE + 0x090) → Unknown
 PAD_XPD_DCDC_CONF (BASE + 0x0A0) 
    BIT0-1: Function (01 = Normal GPIO, 00 = XPD_DCDC)
-```
-
-```
-
----
-
-Do you also want me to **convert the long IOMUX mapping list** (GPIO0 → GPIO15 functions) into a compact table like I did for the GPIO pins?
 ```
 
 ## Timer Registers

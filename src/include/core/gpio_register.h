@@ -1,10 +1,10 @@
 /*
- * file      : gpio_registers.h
+ * file      : gpio_register.h
  * Reference : ESP8266 RTOS SDK
  */
 
-#ifndef GPIO_REGISTERS_H_
-#define GPIO_REGISTERS_H_
+#ifndef GPIO_REGISTER_H_
+#define GPIO_REGISTER_H_
 
 #include <stdint.h>
 

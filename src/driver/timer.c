@@ -5,7 +5,7 @@
 #include <core/isr.h>
 #include <core/reg_rw.h>
 #include <core/system.h>
-#include <core/timer_registers.h>
+#include <core/timer_register.h>
 #include <driver/timer.h>
 #include <response.h>
 

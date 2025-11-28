@@ -2,10 +2,10 @@
  * file      : uart.c
  */
 
-#include <core/io_mux_registers.h>
+#include <core/io_mux_register.h>
 #include <core/reg_rw.h>
 #include <core/system.h>
-#include <core/uart_registers.h>
+#include <core/uart_register.h>
 #include <driver/uart.h>
 #include <response.h>
 #include <stdint.h>

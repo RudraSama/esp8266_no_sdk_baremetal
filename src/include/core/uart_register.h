@@ -1,10 +1,10 @@
 /*
- * file      : uart_registers.h
+ * file      : uart_register.h
  * Reference : ESP8266 RTOS SDK
  */
 
-#ifndef UART_REGISTERS_H_
-#define UART_REGISTERS_H_
+#ifndef UART_REGISTER_H_
+#define UART_REGISTER_H_
 
 
 /*

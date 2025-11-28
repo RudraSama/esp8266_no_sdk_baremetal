@@ -3,10 +3,10 @@
  */
 
 
-#include <core/gpio_registers.h>
-#include <core/io_mux_registers.h>
+#include <core/gpio_register.h>
+#include <core/io_mux_register.h>
 #include <core/reg_rw.h>
-#include <core/rtc_registers.h>
+#include <core/rtc_register.h>
 #include <driver/gpio.h>
 #include <response.h>
 

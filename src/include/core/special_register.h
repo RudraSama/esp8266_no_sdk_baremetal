@@ -1,9 +1,9 @@
 /*
- * file special_registers.h
+ * file special_register.h
  */
 
-#ifndef SPECIAL_REGISTERS_H_
-#define SPECIAL_REGISTERS_H_
+#ifndef SPECIAL_REGISTER_H_
+#define SPECIAL_REGISTER_H_
 
 // Copied directly from ESP8266 FREE RTOS
 

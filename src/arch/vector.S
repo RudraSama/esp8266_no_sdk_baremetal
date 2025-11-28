@@ -1,4 +1,4 @@
-    #include <core/special_registers.h>
+    #include <core/special_register.h>
     #include <core/excause.h>
     #include <core/context.h>
 

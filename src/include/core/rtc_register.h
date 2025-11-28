@@ -1,10 +1,10 @@
 /*
- * file      : rtc_registers.h
+ * file      : rtc_register.h
  * Reference : ESP8266 RTOS SDK
  */
 
-#ifndef RTC_REGISTERS_H_
-#define RTC_REGISTERS_H_
+#ifndef RTC_REGISTER_H_
+#define RTC_REGISTER_H_
 
 #include <stdint.h>
 

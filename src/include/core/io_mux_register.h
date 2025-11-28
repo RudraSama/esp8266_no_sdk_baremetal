@@ -1,11 +1,11 @@
 /*
- * file      : io_mux_registers.h
+ * file      : io_mux_register.h
  * Reference : ESP8266 RTOS SDK
  */
 
 
-#ifndef IO_MUX_REGISTERS_H_
-#define IO_MUX_REGISTERS_H_
+#ifndef IO_MUX_REGISTER_H_
+#define IO_MUX_REGISTER_H_
 
 #include <stdint.h>
 
